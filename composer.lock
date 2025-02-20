@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "673a40c0191ec088c3af7c7b8f97d36e",
+    "content-hash": "33b099c3bb80cbae0ca4a111688879da",
     "packages": [
         {
             "name": "rpurinton/config",
-            "version": "1.0.9",
+            "version": "1.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/config.git",
-                "reference": "22dc2372271154daee48c8a7dcdcefaab31ce50d"
+                "reference": "53a51664c27b2d3e0f48e87725918363b2047ed2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/config/zipball/22dc2372271154daee48c8a7dcdcefaab31ce50d",
-                "reference": "22dc2372271154daee48c8a7dcdcefaab31ce50d",
+                "url": "https://api.github.com/repos/rpurinton/config/zipball/53a51664c27b2d3e0f48e87725918363b2047ed2",
+                "reference": "53a51664c27b2d3e0f48e87725918363b2047ed2",
                 "shasum": ""
             },
             "require": {
@@ -43,9 +43,9 @@
             "description": "A basic configuration loading utility.",
             "support": {
                 "issues": "https://github.com/rpurinton/config/issues",
-                "source": "https://github.com/rpurinton/config/tree/1.0.9"
+                "source": "https://github.com/rpurinton/config/tree/1.0.11"
             },
-            "time": "2025-02-19T20:02:33+00:00"
+            "time": "2025-02-20T20:50:02+00:00"
         },
         {
             "name": "rpurinton/https",
@@ -90,16 +90,16 @@
         },
         {
             "name": "rpurinton/log",
-            "version": "1.0.11",
+            "version": "1.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/log.git",
-                "reference": "e78e1a737c27051688d5c61ff5a84564dabc5162"
+                "reference": "a6859f27309392cb9648703a8e3352a577e47cb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/log/zipball/e78e1a737c27051688d5c61ff5a84564dabc5162",
-                "reference": "e78e1a737c27051688d5c61ff5a84564dabc5162",
+                "url": "https://api.github.com/repos/rpurinton/log/zipball/a6859f27309392cb9648703a8e3352a577e47cb6",
+                "reference": "a6859f27309392cb9648703a8e3352a577e47cb6",
                 "shasum": ""
             },
             "require": {
@@ -126,22 +126,22 @@
             "description": "A Logging Library",
             "support": {
                 "issues": "https://github.com/rpurinton/log/issues",
-                "source": "https://github.com/rpurinton/log/tree/1.0.11"
+                "source": "https://github.com/rpurinton/log/tree/1.0.12"
             },
-            "time": "2025-02-19T20:16:35+00:00"
+            "time": "2025-02-20T20:56:56+00:00"
         },
         {
             "name": "rpurinton/mysql",
-            "version": "1.0.8",
+            "version": "1.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/mysql.git",
-                "reference": "22258cb3e36dac65b8e3f4e78bb4027aaf481b11"
+                "reference": "30875f07969f01ad4fb2d99d372fb50b4347fec4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/22258cb3e36dac65b8e3f4e78bb4027aaf481b11",
-                "reference": "22258cb3e36dac65b8e3f4e78bb4027aaf481b11",
+                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/30875f07969f01ad4fb2d99d372fb50b4347fec4",
+                "reference": "30875f07969f01ad4fb2d99d372fb50b4347fec4",
                 "shasum": ""
             },
             "require": {
@@ -169,9 +169,9 @@
             "description": "A MySQL Library",
             "support": {
                 "issues": "https://github.com/rpurinton/mysql/issues",
-                "source": "https://github.com/rpurinton/mysql/tree/1.0.8"
+                "source": "https://github.com/rpurinton/mysql/tree/1.0.9"
             },
-            "time": "2025-02-20T04:49:07+00:00"
+            "time": "2025-02-20T20:57:16+00:00"
         }
     ],
     "packages-dev": [],
