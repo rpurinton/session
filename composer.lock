@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b4832478ed83d019d26c5b34e3abd136",
+    "content-hash": "4d684191bb5a048d9b0ba86520a39d27",
     "packages": [
         {
             "name": "rpurinton/config",
@@ -132,16 +132,16 @@
         },
         {
             "name": "rpurinton/mysql",
-            "version": "1.0.15",
+            "version": "1.0.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/mysql.git",
-                "reference": "02b6d6d499551382b1b1c27c3034dbde6bc5a1a6"
+                "reference": "346ffe9cadfc1cc89978603acfe0478dcd875cc5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/02b6d6d499551382b1b1c27c3034dbde6bc5a1a6",
-                "reference": "02b6d6d499551382b1b1c27c3034dbde6bc5a1a6",
+                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/346ffe9cadfc1cc89978603acfe0478dcd875cc5",
+                "reference": "346ffe9cadfc1cc89978603acfe0478dcd875cc5",
                 "shasum": ""
             },
             "require": {
@@ -168,9 +168,9 @@
             "description": "A MySQL Library",
             "support": {
                 "issues": "https://github.com/rpurinton/mysql/issues",
-                "source": "https://github.com/rpurinton/mysql/tree/1.0.15"
+                "source": "https://github.com/rpurinton/mysql/tree/1.0.16"
             },
-            "time": "2025-02-21T18:03:19+00:00"
+            "time": "2025-02-22T16:20:00+00:00"
         }
     ],
     "packages-dev": [],
