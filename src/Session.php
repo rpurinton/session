@@ -60,10 +60,12 @@ class Session implements \SessionHandlerInterface
             if ($this->user) return;
         }
         Log::trace("Session::__construct()", ['user' => 'null']);
+        Log::trace("Session::__construct()", ['allow_insecure' => $allow_insecure]);
+
+        if ($allow_insecure) return;
         session_destroy();
         Log::trace("Session::__construct()", ['session_destroy' => 'success']);
-        if ($allow_insecure) return;
-        Log::trace("Session::__construct()", ['allow_insecure' => $allow_insecure]);
+
         if ($json_error) {
             Log::trace("Session::__construct()", ['json_error' => $json_error]);
             header('HTTP/1.1 401 Unauthorized');
