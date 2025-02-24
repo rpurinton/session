@@ -12,15 +12,19 @@ class Session implements \SessionHandlerInterface
 
     public function __construct(string $domain, bool $allow_insecure = false, bool $json_error = true, public ?MySQL $sql = null)
     {
+        Log::trace("Session::__construct()", ['domain' => $domain, 'allow_insecure' => $allow_insecure, 'json_error' => $json_error]);
         if (!$sql) $this->sql = MySQL::connect();
+        Log::trace("Session::__construct()", ['sql' => $this->sql]);
         if (session_status() === PHP_SESSION_ACTIVE) return;
+        Log::trace("Session::__construct()", ['session_status' => session_status()]);
         if (headers_sent()) {
             throw new \RuntimeException('Cannot start session: headers already sent.');
         }
-
+        Log::trace("Session::__construct()", ['headers_sent' => headers_sent()]);
         if (session_status() === PHP_SESSION_DISABLED) {
             throw new \RuntimeException('Cannot start session: sessions are disabled.');
         }
+        Log::trace("Session::__construct()", ['session_status' => session_status()]);
 
         session_set_save_handler(
             $this->open(...),
@@ -31,8 +35,12 @@ class Session implements \SessionHandlerInterface
             $this->gc(...)
         );
 
+        Log::trace("Session::__construct()", ['session_set_save_handler' => 'success']);
+
         register_shutdown_function('session_write_close');
+        Log::trace("Session::__construct()", ['register_shutdown_function' => 'success']);
         session_name(str_replace(".", "", $domain));
+        Log::trace("Session::__construct()", ['session_name' => session_name()]);
         session_set_cookie_params([
             'lifetime' => 99999999,
             'path' => '/',
@@ -41,23 +49,31 @@ class Session implements \SessionHandlerInterface
             'httponly' => true,
             'samesite' => 'Strict'
         ]);
-
+        Log::trace("Session::__construct()", ['session_set_cookie_params' => session_get_cookie_params()]);
         session_start();
+        Log::trace("Session::__construct()", ['session_start' => 'success']);
 
         if (isset($_SESSION['user_id'])) {
+            Log::trace("Session::__construct()", ['user_id' => $_SESSION['user_id']]);
             $this->user = User::getById($this->sql, $_SESSION['user_id']);
+            Log::trace("Session::__construct()", ['user' => $this->user]);
             if ($this->user) return;
         }
-
+        Log::trace("Session::__construct()", ['user' => 'null']);
         session_destroy();
-
+        Log::trace("Session::__construct()", ['session_destroy' => 'success']);
         if ($allow_insecure) return;
+        Log::trace("Session::__construct()", ['allow_insecure' => $allow_insecure]);
         if ($json_error) {
+            Log::trace("Session::__construct()", ['json_error' => $json_error]);
             header('HTTP/1.1 401 Unauthorized');
+            Log::trace("Session::__construct()", ['header' => 'HTTP/1.1 401 Unauthorized']);
             echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+            Log::trace("Session::__construct()", ['json' => json_encode(['status' => 'error', 'message' => 'Unauthorized'])]);
             exit;
         }
 
+        Log::trace("Session::__construct()", ['header' => 'Location: /login/']);
         header('Location: /login/');
         exit;
     }
