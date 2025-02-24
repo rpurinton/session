@@ -12,7 +12,6 @@ class Session implements \SessionHandlerInterface
 
     public function __construct(string $domain, bool $allow_insecure = false, bool $json_error = true, public ?MySQL $sql = null)
     {
-        Log::install();
         if (!$sql) $this->sql = MySQL::connect();
         if (session_status() === PHP_SESSION_ACTIVE) return;
         if (headers_sent()) {
