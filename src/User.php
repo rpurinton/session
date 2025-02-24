@@ -6,6 +6,8 @@ use RPurinton\MySQL;
 
 class User
 {
+    public ?string $password = null;
+
     public function __construct(
         public MySQL $sql,
         public string $id,
@@ -27,8 +29,9 @@ class User
 
     public function save(): bool
     {
-        $data = $this->sql->escape(json_encode($this->data | JSON_PRETTY_PRINT));
+        $data = $this->sql->escape(json_encode($this->data, JSON_PRETTY_PRINT));
         $this->sql->query("UPDATE users SET data = '$data' WHERE id = '{$this->id}'");
+        if ($this->password) self::updatePassword($this->sql, $this->username, $this->password);
         return true;
     }
 
@@ -39,11 +42,9 @@ class User
         }
         $hashedPassword = password_hash(hash('sha256', $password), PASSWORD_BCRYPT);
         $query = "INSERT INTO users (id, username, password, display_name, timezone) VALUES (UUID(), ?, ?, ?, ?)";
-        // Using a transaction to ensure persistence
         $sql->transaction(function () use ($sql, $query, $username, $hashedPassword, $displayName, $timezone) {
             $sql->prepareAndExecute($query, [$username, $hashedPassword, $displayName, $timezone]);
         });
-        echo "User '$username' created successfully.\n";
     }
 
     public static function userExists(MySQL $sql, string $username): bool
@@ -63,7 +64,6 @@ class User
         $sql->transaction(function () use ($sql, $query, $hashedPassword, $username) {
             $sql->prepareAndExecute($query, [$hashedPassword, $username]);
         });
-        echo "Password for user '$username' updated successfully.\n";
     }
 
     public static function deleteUser(MySQL $sql, string $username): void
@@ -86,29 +86,40 @@ class User
             $query = "DELETE FROM users WHERE id = ?";
             $sql->prepareAndExecute($query, [$user_id]);
         });
-        echo "User '$username' deleted successfully.\n";
     }
 
-    public static function listUsers(MySQL $sql): void
+    public static function listUsers(MySQL $sql): array
     {
         $users = $sql->fetch_all("SELECT id, username FROM users");
-        foreach ($users as $user) {
-            echo "Username: {$user['username']}\n";
-        }
-        if (!$users) {
-            echo "No users found.\n";
-        }
+        return $users;
     }
 
     public static function getByUsername(MySQL $sql, string $username): ?self
     {
-	$username = $sql->escape($username);
+        $username = $sql->escape($username);
         $user = $sql->fetch_row("SELECT * FROM users WHERE username = '$username'");
         if ($user) {
             return new self(
+                $sql,
                 $user['id'],
                 $user['username'],
                 $user['data'],
+            );
+        }
+        return null;
+    }
+
+    public static function getById(MySQL $sql, string $id): ?self
+    {
+        $id = $sql->escape($id);
+        $user = $sql->fetch_row("SELECT * FROM users WHERE id = '$id'");
+        $user['data'] = json_decode($user['data'], true);
+        if ($user) {
+            return new self(
+                $sql,
+                $user['id'],
+                $user['username'],
+                $user['data']
             );
         }
         return null;

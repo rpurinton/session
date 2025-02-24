@@ -13,7 +13,7 @@ class Session implements \SessionHandlerInterface
     public function __construct(string $domain, bool $allow_insecure = false, bool $json_error = true, public ?MySQL $sql = null)
     {
         Log::install();
-        if(!$sql) $this->sql = MySQL::connect();
+        if (!$sql) $this->sql = MySQL::connect();
         if (session_status() === PHP_SESSION_ACTIVE) return;
         if (headers_sent()) {
             throw new \RuntimeException('Cannot start session: headers already sent.');
@@ -46,7 +46,7 @@ class Session implements \SessionHandlerInterface
         session_start();
 
         if (isset($_SESSION['user_id'])) {
-            $this->user = User::confirm($this->sql, $_SESSION['user_id']);
+            $this->user = User::getById($this->sql, $_SESSION['user_id']);
             if ($this->user) return;
         }
 
