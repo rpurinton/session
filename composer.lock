@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "54d1699be17ab713679c3eea4b0fd0e0",
+    "content-hash": "40385c301ee8f4ef0a57911e4d9b4886",
     "packages": [
         {
             "name": "rpurinton/config",
-            "version": "1.0.23",
+            "version": "1.0.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/config.git",
-                "reference": "35a0e80b9645eebc154b2c9be57ab75d0bf76371"
+                "reference": "5e4abc0f773f71f0df4b0f78ab3094c75dd0173d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/config/zipball/35a0e80b9645eebc154b2c9be57ab75d0bf76371",
-                "reference": "35a0e80b9645eebc154b2c9be57ab75d0bf76371",
+                "url": "https://api.github.com/repos/rpurinton/config/zipball/5e4abc0f773f71f0df4b0f78ab3094c75dd0173d",
+                "reference": "5e4abc0f773f71f0df4b0f78ab3094c75dd0173d",
                 "shasum": ""
             },
             "require": {
@@ -43,9 +43,9 @@
             "description": "A basic configuration loading utility.",
             "support": {
                 "issues": "https://github.com/rpurinton/config/issues",
-                "source": "https://github.com/rpurinton/config/tree/1.0.23"
+                "source": "https://github.com/rpurinton/config/tree/1.0.24"
             },
-            "time": "2025-02-25T22:44:06+00:00"
+            "time": "2025-02-26T20:31:02+00:00"
         },
         {
             "name": "rpurinton/https",
@@ -217,12 +217,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.0"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

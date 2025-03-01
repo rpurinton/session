@@ -1,0 +1,8 @@
+{
+    "lifetime": 3600,
+    "path": "/",
+    "domain": "localhost",
+    "secure": false,
+    "httponly": true,
+    "sameSite": "Lax"
+}
