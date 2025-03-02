@@ -1,4 +1,4 @@
 {
-    "level": "debug",
-    "file": "php://stdout"
+    "level": "trace",
+    "file": "error_log()"
 }

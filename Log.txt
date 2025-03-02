@@ -1,0 +1,45 @@
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"allow_insecure":true,"json_error":true}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"config":{"lifetime":3600,"path":"\/","domain":"localhost","secure":false,"httponly":true,"sameSite":"Lax"}}
+2025-03-02 01:24:18 [TRACE] Static connect called {"config":null}
+2025-03-02 01:24:18 [TRACE] Constructor called {"config":null}
+2025-03-02 01:24:18 [DEBUG] Configuration loaded {"config":{"host":"127.0.0.1","user":"testmysql","pass":"testmysql","db":"testmysql"}}
+2025-03-02 01:24:18 [TRACE] Reconnect called []
+2025-03-02 01:24:18 [DEBUG] Attempting database connection {"host":"127.0.0.1","user":"testmysql","db":"testmysql"}
+2025-03-02 01:24:18 [DEBUG] Ping time set {"ping_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Wait timeout fetched {"wait_timeout":28800}
+2025-03-02 01:24:18 [INFO] Database reconnected successfully []
+2025-03-02 01:24:18 [INFO] MySQL initialization completed successfully []
+2025-03-02 01:24:18 [INFO] Static connect: connection established []
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"sql":{}}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"session_status":1}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"headers_sent":false}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"session_status":1}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"session_set_save_handler":"success"}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"register_shutdown_function":"success"}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"session_name":"localhost"}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"session_set_cookie_params":{"lifetime":3600,"path":"\/","domain":"localhost","secure":false,"httponly":true,"samesite":"Lax"}}
+2025-03-02 01:24:18 [TRACE] Preparing and executing query {"query":"SELECT `data` FROM `sessions_php` WHERE `id` = ? LIMIT 1","params":["16maduppdu5s26b6p6nug6m3op"]}
+2025-03-02 01:24:18 [TRACE] Ping called {"ping_time":1740878658,"wait_timeout":28800,"current_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Ping: within wait_timeout, resetting ping_time {"new_ping_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Binding parameters {"types":"s","params":["16maduppdu5s26b6p6nug6m3op"]}
+2025-03-02 01:24:18 [INFO] Prepare and execute completed {"result":"result set returned"}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"session_start":"success"}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"user":"null"}
+2025-03-02 01:24:18 [TRACE] Session::__construct() {"allow_insecure":true}
+2025-03-02 01:24:18 [TRACE] Beginning transaction []
+2025-03-02 01:24:18 [TRACE] Ping called {"ping_time":1740878658,"wait_timeout":28800,"current_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Ping: within wait_timeout, resetting ping_time {"new_ping_time":1740878658}
+2025-03-02 01:24:18 [TRACE] Preparing and executing query {"query":"SELECT data FROM sessions_php WHERE id = ? FOR UPDATE","params":["16maduppdu5s26b6p6nug6m3op"]}
+2025-03-02 01:24:18 [TRACE] Ping called {"ping_time":1740878658,"wait_timeout":28800,"current_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Ping: within wait_timeout, resetting ping_time {"new_ping_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Binding parameters {"types":"s","params":["16maduppdu5s26b6p6nug6m3op"]}
+2025-03-02 01:24:18 [INFO] Prepare and execute completed {"result":"result set returned"}
+2025-03-02 01:24:18 [TRACE] Preparing and executing query {"query":"REPLACE INTO sessions_php (id, access, data) VALUES (?, ?, ?)","params":["16maduppdu5s26b6p6nug6m3op",1740878658,""]}
+2025-03-02 01:24:18 [TRACE] Ping called {"ping_time":1740878658,"wait_timeout":28800,"current_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Ping: within wait_timeout, resetting ping_time {"new_ping_time":1740878658}
+2025-03-02 01:24:18 [DEBUG] Binding parameters {"types":"sis","params":["16maduppdu5s26b6p6nug6m3op",1740878658,""]}
+2025-03-02 01:24:18 [INFO] Prepare and execute completed {"result":"result set returned"}
+2025-03-02 01:24:18 [INFO] Transaction committed successfully []
+2025-03-02 01:24:18 [TRACE] Destructor called []
+2025-03-02 01:24:18 [TRACE] Shutdown called []
+2025-03-02 01:24:18 [INFO] Database connection closed []
