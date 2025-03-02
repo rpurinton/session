@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "^8.0",
-        "rpurinton/mysql": "^1.0.19",
+        "rpurinton/mysql": "^1.0.20",
         "rpurinton/log": "^1.0.26"
     },
     "autoload": {
@@ -19,6 +19,6 @@
             "RPurinton\\": "src/"
         }
     },
-    "version": "1.0.19",
+    "version": "1.0.20",
     "minimum-stability": "stable"
 }

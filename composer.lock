@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "583f484442c93ee6a41b26109bce28f8",
+    "content-hash": "ea10106a6834190e974d2f6efbbed17b",
     "packages": [
         {
             "name": "rpurinton/config",
@@ -132,22 +132,22 @@
         },
         {
             "name": "rpurinton/mysql",
-            "version": "1.0.19",
+            "version": "1.0.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/mysql.git",
-                "reference": "8b902f610c1f10df611a64151eb3218fa0c38f0e"
+                "reference": "1f447244a11672ae0f572b0b20a6800f808bafce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/8b902f610c1f10df611a64151eb3218fa0c38f0e",
-                "reference": "8b902f610c1f10df611a64151eb3218fa0c38f0e",
+                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/1f447244a11672ae0f572b0b20a6800f808bafce",
+                "reference": "1f447244a11672ae0f572b0b20a6800f808bafce",
                 "shasum": ""
             },
             "require": {
                 "ext-mysqli": "*",
                 "php": "^8.0",
-                "rpurinton/config": "^1.0.23"
+                "rpurinton/config": "^1.0.24"
             },
             "type": "library",
             "autoload": {
@@ -168,9 +168,9 @@
             "description": "A MySQL Library",
             "support": {
                 "issues": "https://github.com/rpurinton/mysql/issues",
-                "source": "https://github.com/rpurinton/mysql/tree/1.0.19"
+                "source": "https://github.com/rpurinton/mysql/tree/1.0.20"
             },
-            "time": "2025-02-25T22:52:00+00:00"
+            "time": "2025-03-01T23:59:15+00:00"
         },
         {
             "name": "rpurinton/webhook",
