@@ -67,20 +67,45 @@ class Session implements \SessionHandlerInterface
 
     public static function connect(bool $allow_insecure = false, bool $json_error = true): Session
     {
+        Log::trace("Session::connect()", ['allow_insecure' => $allow_insecure, 'json_error' => $json_error]);
         return new Session($allow_insecure, $json_error);
     }
 
     public function open(string $path, string $name): bool
     {
+        Log::trace("Session::open()", ['path' => $path, 'name' => $name]);
         return true;
     }
 
     public function login(): void
     {
-        $initials = DiscordOAuth2::init();
-        print_r($initials);
-        $info = DiscordOAuth2::info($initials['access_token']);
-        print_r($info);
+        Log::trace("Session::login()");
+        if (!$this->user) {
+            $initials = DiscordOAuth2::init();
+            if (empty($initials['access_token'])) {
+                Log::error("Session::login()", ['error' => 'empty access_token', 'initials' => $initials]);
+                header('HTTP/1.1 403 Unauthorized');
+                exit();
+            }
+            $info = DiscordOAuth2::info($initials['access_token']);
+            if (empty($info['id'])) {
+                Log::error("Session::login()", ['error' => 'empty id', 'info' => $info]);
+                header('HTTP/1.1 403 Unauthorized');
+                exit();
+            }
+            $id = $info['id'];
+            $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
+            if (empty($grants)) {
+                Log::error("Session::login()", ['error' => 'empty grants', 'grants' => $grants]);
+                header("HTTP/1.1 403 Unauthorized");
+                exit();
+            }
+            $discord_data = array_merge($initials, $info);
+            (new User($this->sql, $id, ['discord' => $discord_data]))->save();
+            $_SESSION['user_id'] = $id;
+        }
+        header('Location: /');
+        exit();
     }
 
     public function refresh(string $refresh_token): void
