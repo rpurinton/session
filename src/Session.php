@@ -42,7 +42,7 @@ class Session implements \SessionHandlerInterface
         Log::trace("Session::__construct()", ['session_set_cookie_params' => session_get_cookie_params()]);
         session_start();
         Log::trace("Session::__construct()", ['1_SESSION' => $_SESSION]);
-        session_regenerate_id(true);
+        session_regenerate_id();
         Log::trace("Session::__construct()", ['2_SESSION' => $_SESSION]);
         if (isset($_SESSION['user_id'])) {
             Log::trace("Session::__construct()", ['session_user_id' => $_SESSION['user_id']]);
