@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RPurinton;
 
+use ReturnTypeWillChange;
 use RPurinton\{Log, Config, MySQL, User, DiscordOAuth2};
 
 class Session implements \SessionHandlerInterface
@@ -89,34 +90,49 @@ class Session implements \SessionHandlerInterface
     {
         Log::trace("Session::login()");
         if (!$this->user) {
+            Log::trace("Session::login()", ['user' => 'null']);
             $tokens = DiscordOAuth2::init();
             if (empty($tokens['access_token'])) $this->login_error('empty access_token', ['tokens' => $tokens]);
             if (empty($tokens['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $tokens]);
             if (empty($tokens['expires_in'])) $this->login_error('empty expires_in', ['tokens' => $tokens]);
             $tokens['expires_at'] = time() + $tokens['expires_in'];
+            Log::trace("Session::login()", ['tokens' => $tokens]);
             $info = DiscordOAuth2::info($tokens['access_token']);
             if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
+            Log::trace("Session::login()", ['info' => $info]);
             $id = (int)$info['id'];
             $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
             if (empty($grants)) $this->login_error('empty grants', ['grants' => $grants]);
-            $user = new User($this->sql, $id, ['tokens' => $tokens, 'info' => $info]);
-            $user->save();
+            Log::trace("Session::login()", ['grants' => $grants]);
+            $this->user = new User($this->sql, $id, ['tokens' => $tokens, 'info' => $info]);
+            Log::trace("Session::login()", ['user' => $this->user]);
+            $this->user->save();
+            Log::trace("Session::login() saved", ['user' => $this->user]);
             $_SESSION['user_id'] = $id;
+            Log::trace("Session::login()", ['user_id' => $_SESSION['user_id']]);
         }
-        if ($this->user->data['tokens']['expires_at'] < time()) $this->refresh($this->user->data['tokens']['refresh_token']);
+        Log::trace("Session::login()", ['user' => $this->user]);
+        $this->refresh();
+        Log::trace("Session::login()", ['refresh' => $this->user->data['tokens']]);
         header('Location: /');
         exit();
     }
 
-    public function refresh(string $refresh_token): void
+    public function refresh(): void
     {
-        $refresh = DiscordOauth2::refresh($refresh_token);
+        Log::trace("Session::refresh()", ['tokens' => $this->user->data['tokens']]);
+        if ($this->user->data['tokens']['expires_at'] > time()) return;
+        Log::trace("Session::refresh()", ['expires_at' => $this->user->data['tokens']['expires_at']]);
+        if (empty($this->user->data['tokens']['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $this->user->data['tokens']]);
+        Log::trace("Session::refresh()", ['refresh_token' => $this->user->data['tokens']['refresh_token']]);
+        $refresh = DiscordOauth2::refresh($this->user->data['tokens']['refresh_token']);
         if (empty($refresh['access_token'])) $this->login_error('empty access_token', ['refresh' => $refresh]);
         if (empty($refresh['expires_in'])) $this->login_error('empty expires_in', ['refresh' => $refresh]);
-        $this->user->data['tokens']['access_token'] = $refresh['access_token'];
-        $this->user->data['tokens']['expires_in'] = $refresh['expires_in'];
-        $this->user->data['tokens']['expires_at'] = time() + $refresh['expires_in'];
+        $refresh['expires_at'] = time() + $refresh['expires_in'];
+        Log::trace("Session::refresh()", ['refresh' => $refresh]);
+        $this->user->data['tokens'] = array_merge($this->user->data['tokens'], $refresh);
         $this->user->save();
+        Log::trace("Session::refresh() saved", ['user' => $this->user]);
     }
 
     public function logout(): void
