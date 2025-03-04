@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "322a5fa00f0c00c758f627b528bdd6cb",
+    "content-hash": "2532c129fd204116c988f3ce70e6d84f",
     "packages": [
         {
             "name": "rpurinton/config",
@@ -49,16 +49,16 @@
         },
         {
             "name": "rpurinton/discordoauth2",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/discordoauth2.git",
-                "reference": "04a161813608867c13173320cdc5021e8273db02"
+                "reference": "ee030c92ab6220cf8bd3522b3465414be0dfc4cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/discordoauth2/zipball/04a161813608867c13173320cdc5021e8273db02",
-                "reference": "04a161813608867c13173320cdc5021e8273db02",
+                "url": "https://api.github.com/repos/rpurinton/discordoauth2/zipball/ee030c92ab6220cf8bd3522b3465414be0dfc4cf",
+                "reference": "ee030c92ab6220cf8bd3522b3465414be0dfc4cf",
                 "shasum": ""
             },
             "require": {
@@ -84,9 +84,9 @@
             "description": "A Discord OAuth2 Library for PHP",
             "support": {
                 "issues": "https://github.com/rpurinton/discordoauth2/issues",
-                "source": "https://github.com/rpurinton/discordoauth2/tree/1.0.4"
+                "source": "https://github.com/rpurinton/discordoauth2/tree/1.0.5"
             },
-            "time": "2025-03-04T15:53:07+00:00"
+            "time": "2025-03-04T16:19:58+00:00"
         },
         {
             "name": "rpurinton/https",
