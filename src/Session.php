@@ -77,8 +77,10 @@ class Session implements \SessionHandlerInterface
 
     public function login(): void
     {
-        $result = DiscordOAuth2::connect();
-        print_r($result);
+        $initials = DiscordOAuth2::init();
+        print_r($initials);
+        $info = DiscordOAuth2::info($initials['access_token']);
+        print_r($info);
     }
 
     public function refresh(string $refresh_token): void
