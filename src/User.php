@@ -20,7 +20,7 @@ class User
         return true;
     }
 
-    public static function get(MySQL $sql, string $id): ?self
+    public static function get(MySQL $sql, int $id): ?self
     {
         $id = $sql->escape($id);
         $data = json_decode($sql->fetch_one("SELECT `data` FROM `users` WHERE `id` = '$id'"), true);
