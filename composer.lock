@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "970acf640dff94db23bd4d1ae711dfc3",
+    "content-hash": "322a5fa00f0c00c758f627b528bdd6cb",
     "packages": [
         {
             "name": "rpurinton/config",
@@ -46,6 +46,47 @@
                 "source": "https://github.com/rpurinton/config/tree/1.0.25"
             },
             "time": "2025-03-03T10:05:58+00:00"
+        },
+        {
+            "name": "rpurinton/discordoauth2",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rpurinton/discordoauth2.git",
+                "reference": "04a161813608867c13173320cdc5021e8273db02"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rpurinton/discordoauth2/zipball/04a161813608867c13173320cdc5021e8273db02",
+                "reference": "04a161813608867c13173320cdc5021e8273db02",
+                "shasum": ""
+            },
+            "require": {
+                "rpurinton/config": "^1.0.25",
+                "rpurinton/https": "^1.0.19"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "RPurinton\\DiscordOAuth2\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Russell Purinton",
+                    "email": "russell.purinton@gmail.com"
+                }
+            ],
+            "description": "A Discord OAuth2 Library for PHP",
+            "support": {
+                "issues": "https://github.com/rpurinton/discordoauth2/issues",
+                "source": "https://github.com/rpurinton/discordoauth2/tree/1.0.4"
+            },
+            "time": "2025-03-04T15:53:07+00:00"
         },
         {
             "name": "rpurinton/https",
