@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RPurinton;
 
-use RPurinton\{Log, Config, MySQL, User};
+use RPurinton\{Log, Config, MySQL, User, DiscordOauth2};
 
 class Session implements \SessionHandlerInterface
 {
@@ -119,5 +119,16 @@ class Session implements \SessionHandlerInterface
     public function __destruct()
     {
         $this->close();
+    }
+
+    public function login(): bool
+    {
+        $result = DiscordOAuth2::init();
+        print_r($result);
+    }
+
+    public function logout(): bool
+    {
+        return true;
     }
 }
