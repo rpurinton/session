@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RPurinton;
 
-use RPurinton\{Log, Config, MySQL, User, DiscordOauth2};
+use RPurinton\{Log, Config, MySQL, User, DiscordOAuth2};
 
 class Session implements \SessionHandlerInterface
 {
@@ -77,7 +77,7 @@ class Session implements \SessionHandlerInterface
 
     public function login(): void
     {
-        $result = DiscordOauth2::connect();
+        $result = DiscordOAuth2::connect();
         print_r($result);
     }
 
