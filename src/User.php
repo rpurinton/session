@@ -16,7 +16,7 @@ class User
     public function save(): bool
     {
         $data = $this->sql->escape(json_encode($this->data, JSON_PRETTY_PRINT));
-        $this->sql->query("REPLACE INTO `users` SET `data` = '$data' WHERE `id` = '{$this->id}'");
+        $this->sql->query("REPLACE INTO `users` (`id`, `data`) VALUES ('$this->id', '$data')");
         return true;
     }
 
