@@ -99,8 +99,10 @@ class Session implements \SessionHandlerInterface
             Log::trace("Session::login()", ['tokens' => $tokens]);
             $info = DiscordOAuth2::info($tokens['access_token']);
             if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
+            if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
             Log::trace("Session::login()", ['info' => $info]);
             $id = (int)$info['id'];
+            $info['avatar'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
             $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
             if (empty($grants)) $this->login_error('empty grants', ['grants' => $grants]);
             Log::trace("Session::login()", ['grants' => $grants]);
@@ -130,7 +132,14 @@ class Session implements \SessionHandlerInterface
         if (empty($refresh['expires_in'])) $this->login_error('empty expires_in', ['refresh' => $refresh]);
         $refresh['expires_at'] = time() + $refresh['expires_in'];
         Log::trace("Session::refresh()", ['refresh' => $refresh]);
-        $this->user->data['tokens'] = array_merge($this->user->data['tokens'], $refresh);
+        $this->user->data['tokens'] = $refresh;
+        $info = DiscordOAuth2::info($refresh['access_token']);
+        if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
+        if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
+        $info['avatar'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
+        Log::trace("Session::refresh()", ['info' => $info]);
+        $this->user->data['info'] = $info;
+        Log::trace("Session::refresh()", ['user' => $this->user]);
         $this->user->save();
         Log::trace("Session::refresh() saved", ['user' => $this->user]);
     }
