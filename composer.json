@@ -13,13 +13,13 @@
         "php": "^8.0",
         "rpurinton/mysql": "^1.0.31",
         "rpurinton/log": "^1.0.32",
-        "rpurinton/discordoauth2": "^1.0.7"
+        "rpurinton/discordoauth2": "^1.0.8"
     },
     "autoload": {
         "psr-4": {
             "RPurinton\\": "src/"
         }
     },
-    "version": "1.0.29",
+    "version": "1.0.30",
     "minimum-stability": "stable"
 }
