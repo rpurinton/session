@@ -120,15 +120,4 @@ class Session implements \SessionHandlerInterface
     {
         $this->close();
     }
-
-    public function login(): bool
-    {
-        $result = DiscordOAuth2::init();
-        print_r($result);
-    }
-
-    public function logout(): bool
-    {
-        return true;
-    }
 }
