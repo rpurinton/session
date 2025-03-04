@@ -14,7 +14,7 @@ class Session implements \SessionHandlerInterface
     public function __construct(bool $allow_insecure = false, bool $json_error = true, public ?MySQL $sql = null)
     {
         Log::trace("Session::__construct()", ['allow_insecure' => $allow_insecure, 'json_error' => $json_error]);
-        $this->config = Config::get("Session", []);
+        $this->config = Config::get("Session");
         Log::trace("Session::__construct()", ['config' => $this->config]);
         if (!$sql) $this->sql = MySQL::connect();
         Log::trace("Session::__construct()", ['sql' => $this->sql]);
@@ -43,7 +43,7 @@ class Session implements \SessionHandlerInterface
         Log::trace("Session::__construct()", ['session_start' => 'success']);
         if (isset($_SESSION['user_id'])) {
             Log::trace("Session::__construct()", ['user_id' => $_SESSION['user_id']]);
-            $this->user = User::getById($this->sql, $_SESSION['user_id']);
+            $this->user = User::get($this->sql, $_SESSION['user_id']);
             Log::trace("Session::__construct()", ['user' => $this->user]);
             if ($this->user) return;
         }
@@ -74,6 +74,26 @@ class Session implements \SessionHandlerInterface
     {
         return true;
     }
+
+    public function login(): void
+    {
+        $result = DiscordOauth2::connect();
+        print_r($result);
+    }
+
+    public function refresh(string $refresh_token): void
+    {
+        $result = DiscordOauth2::refresh($refresh_token);
+        print_r($result);
+    }
+
+    public function logout(): void
+    {
+        session_destroy();
+        header('Location: /login/');
+        exit;
+    }
+
 
     public function read(string $id): string|false
     {

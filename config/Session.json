@@ -2,7 +2,7 @@
     "lifetime": 3600,
     "path": "/",
     "domain": "localhost",
-    "secure": false,
+    "secure": true,
     "httponly": true,
-    "sameSite": "Lax"
+    "sameSite": "Strict"
 }
