@@ -113,7 +113,7 @@ class Session implements \SessionHandlerInterface
             $this->user->save();
             Log::trace("Session::login() saved", ['user' => $this->user]);
             $_SESSION['user_id'] = $id;
-            Log::trace("Session::login()", ['user_id' => $_SESSION['user_id']]);
+            Log::trace("Session::login()", ['session' => $_SESSION, 'session_user_id' => $_SESSION['user_id']]);
         }
         Log::trace("Session::login()", ['user' => $this->user]);
         $this->refresh();
