@@ -93,7 +93,7 @@ class Session implements \SessionHandlerInterface
                 header('HTTP/1.1 403 Unauthorized');
                 exit();
             }
-            $id = $info['id'];
+            $id = (int)$info['id'];
             $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
             if (empty($grants)) {
                 Log::error("Session::login()", ['error' => 'empty grants', 'grants' => $grants]);
