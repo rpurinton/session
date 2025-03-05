@@ -31,7 +31,6 @@ class Session implements \SessionHandlerInterface
         session_name(str_replace(".", "", $this->config['domain']));
         session_set_cookie_params($this->config);
         session_start();
-        session_regenerate_id();
         if (isset($_SESSION['user_id'])) {
             $this->user = User::get($this->sql, $_SESSION['user_id']);
             if ($this->user) {
