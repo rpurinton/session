@@ -87,7 +87,7 @@ class Session implements \SessionHandlerInterface
         if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
         if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
         $id = (int)$info['id'];
-        $info['avatar'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
+        $info['avatar_url'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
         $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
         if (empty($grants)) $this->login_error('empty grants', ['grants' => $grants]);
         $ip_id = ip2long($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']);
