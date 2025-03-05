@@ -202,7 +202,7 @@ class Session implements \SessionHandlerInterface
             $refresh['expires_at'] = time() + $refresh['expires_in'];
             $this->user->data['tokens'] = $refresh;
         }
-        $info = DiscordOAuth2::info($refresh['access_token']);
+        $info = DiscordOAuth2::info($this->user->data['tokens']['access_token']);
         if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
         if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
         $info['avatar_url'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
