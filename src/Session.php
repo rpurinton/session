@@ -169,6 +169,7 @@ class Session implements \SessionHandlerInterface
                 $_SERVER['HTTP_CF_IPCONTINENT'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCONTINENT']) : null,
                 $_SERVER['HTTP_ACCEPT_LANGUAGE'] ? $this->sql->escape($_SERVER['HTTP_ACCEPT_LANGUAGE']) : null,
                 $_SERVER['HTTP_USER_AGENT'] ? $this->sql->escape($_SERVER['HTTP_USER_AGENT']) : null,
+                $login ? 1 : 0,
                 $login ? 1 : 0
             ]);
             $ip_history_id = $this->sql->last_insert_id();
