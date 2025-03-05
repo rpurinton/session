@@ -14,17 +14,11 @@ class Session implements \SessionHandlerInterface
 
     public function __construct(bool $allow_insecure = false, bool $json_error = true, public ?MySQL $sql = null)
     {
-        Log::trace("Session::__construct()", ['allow_insecure' => $allow_insecure, 'json_error' => $json_error]);
         $this->config = Config::get("Session");
-        Log::trace("Session::__construct()", ['config' => $this->config]);
         if (!$sql) $this->sql = MySQL::connect();
-        Log::trace("Session::__construct()", ['sql' => $this->sql]);
         if (session_status() === PHP_SESSION_ACTIVE) return;
-        Log::trace("Session::__construct()", ['session_status' => session_status()]);
         if (headers_sent()) throw new \RuntimeException('Cannot start session: headers already sent.');
-        Log::trace("Session::__construct()", ['headers_sent' => headers_sent()]);
         if (session_status() === PHP_SESSION_DISABLED) throw new \RuntimeException('Cannot start session: sessions are disabled.');
-        Log::trace("Session::__construct()", ['session_status' => session_status()]);
         session_set_save_handler(
             $this->open(...),
             $this->close(...),
@@ -33,117 +27,182 @@ class Session implements \SessionHandlerInterface
             $this->destroy(...),
             $this->gc(...)
         );
-        Log::trace("Session::__construct()", ['session_set_save_handler' => 'success']);
         register_shutdown_function('session_write_close');
-        Log::trace("Session::__construct()", ['register_shutdown_function' => 'success']);
         session_name(str_replace(".", "", $this->config['domain']));
-        Log::trace("Session::__construct()", ['session_name' => session_name()]);
         session_set_cookie_params($this->config);
-        Log::trace("Session::__construct()", ['session_set_cookie_params' => session_get_cookie_params()]);
         session_start();
-        Log::trace("Session::__construct()", ['1_SESSION' => $_SESSION]);
         session_regenerate_id();
-        Log::trace("Session::__construct()", ['2_SESSION' => $_SESSION]);
         if (isset($_SESSION['user_id'])) {
-            Log::trace("Session::__construct()", ['session_user_id' => $_SESSION['user_id']]);
             $this->user = User::get($this->sql, $_SESSION['user_id']);
-            Log::trace("Session::__construct()", ['user' => $this->user]);
-            if ($this->user) return;
+            if ($this->user) {
+                $this->refresh();
+                $this->audit();
+                $this->user->save();
+                return;
+            }
         }
-        Log::trace("Session::__construct()", ['user' => 'null']);
-        Log::trace("Session::__construct()", ['allow_insecure' => $allow_insecure]);
         if ($allow_insecure) return;
         session_destroy();
-        Log::trace("Session::__construct()", ['session_destroy' => 'success']);
         if ($json_error) {
-            Log::trace("Session::__construct()", ['json_error' => $json_error]);
             header('HTTP/1.1 401 Unauthorized');
-            Log::trace("Session::__construct()", ['header' => 'HTTP/1.1 401 Unauthorized']);
             echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
-            Log::trace("Session::__construct()", ['json' => json_encode(['status' => 'error', 'message' => 'Unauthorized'])]);
             exit;
         }
-        Log::trace("Session::__construct()", ['header' => 'Location: /login/']);
         header('Location: /login/');
         exit;
     }
 
+    public function audit(): void
+    {
+        $this->user->data['audits']['last_activity'] = time();
+        $this->user->data['audits']['page_views']++;
+        $this->user->save();
+    }
+
     public static function connect(bool $allow_insecure = false, bool $json_error = true): Session
     {
-        Log::trace("Session::connect()", ['allow_insecure' => $allow_insecure, 'json_error' => $json_error]);
         return new Session($allow_insecure, $json_error);
     }
 
     public function open(string $path, string $name): bool
     {
-        Log::trace("Session::open()", ['path' => $path, 'name' => $name]);
         return true;
+    }
+
+    public function login(): void
+    {
+        if (!$this->user) $this->createUser();
+        $this->refresh();
+        header('Location: /');
+        exit();
     }
 
     private function login_error(string $message, array $context): void
     {
         Log::error("Session::login_error() $message", $context);
         header('HTTP/1.1 403 Unauthorized');
-        session_destroy();
         exit();
     }
 
-    public function login(): void
+    private function createUser(): void
     {
-        Log::trace("Session::login()");
-        if (!$this->user) {
-            Log::trace("Session::login()", ['user' => 'null']);
-            $tokens = DiscordOAuth2::init();
-            if (empty($tokens['access_token'])) $this->login_error('empty access_token', ['tokens' => $tokens]);
-            if (empty($tokens['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $tokens]);
-            if (empty($tokens['expires_in'])) $this->login_error('empty expires_in', ['tokens' => $tokens]);
-            $tokens['expires_at'] = time() + $tokens['expires_in'];
-            Log::trace("Session::login()", ['tokens' => $tokens]);
-            $info = DiscordOAuth2::info($tokens['access_token']);
-            if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
-            if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
-            Log::trace("Session::login()", ['info' => $info]);
-            $id = (int)$info['id'];
-            $info['avatar'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
-            $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
-            if (empty($grants)) $this->login_error('empty grants', ['grants' => $grants]);
-            Log::trace("Session::login()", ['grants' => $grants]);
-            $this->user = new User($this->sql, $id, ['tokens' => $tokens, 'info' => $info]);
-            Log::trace("Session::login()", ['user' => $this->user]);
-            $this->user->save();
-            Log::trace("Session::login() saved", ['user' => $this->user]);
-            $_SESSION['user_id'] = $id;
-            Log::trace("Session::login()", ['session' => $_SESSION, 'session_user_id' => $_SESSION['user_id']]);
-        }
-        Log::trace("Session::login()", ['user' => $this->user]);
-        $this->refresh();
-        Log::trace("Session::login()", ['refresh' => $this->user->data['tokens']]);
-        header('Location: /');
-        exit();
+        $tokens = DiscordOAuth2::init();
+        if (empty($tokens['access_token'])) $this->login_error('empty access_token', ['tokens' => $tokens]);
+        if (empty($tokens['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $tokens]);
+        if (empty($tokens['expires_in'])) $this->login_error('empty expires_in', ['tokens' => $tokens]);
+        $tokens['expires_at'] = time() + $tokens['expires_in'];
+        $info = DiscordOAuth2::info($tokens['access_token']);
+        if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
+        if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
+        $id = (int)$info['id'];
+        $info['avatar'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
+        $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
+        if (empty($grants)) $this->login_error('empty grants', ['grants' => $grants]);
+        $ip_id = ip2long($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']);
+        if ($ip_id === false) $this->login_error('invalid ip', [
+            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
+            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
+        ]);
+        $this->user = new User($this->sql, $id, [
+            'tokens' => $tokens,
+            'info' => $info,
+            'audits' => [
+                'first_user_id' => $id,
+                'last_user_id' => $id,
+                'first_ip_id' => $ip_id,
+                'last_ip_id' => $ip_id,
+                'login_first' => time(),
+                'login_last' => time(),
+                'last_activity' => time(),
+                'account_type' => 'trial',
+                'trial_expires' => time() + 604800, // 7 days
+                'logins' => 1,
+                'page_views' => 1
+            ],
+        ]);
+        $this->user->save();
+        $this->get_ip_id(true);
+        $_SESSION['user_id'] = $id;
+    }
+
+    private function get_ip_id(bool $login = false): void
+    {
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) $this->login_error('invalid ip format', [
+            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
+            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
+        ]);
+        $id = ip2long($ip);
+        if ($id === false) $this->login_error('invalid ip conversion', [
+            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
+            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
+        ]);
+        $this->sql->transaction(function () use ($id, $ip, $login) {
+            $this->sql->query("
+                INSERT INTO `ip_addresses`
+                    (`id`, `ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `last_activity`, `logins`, `page_views`)
+                VALUES
+                    ($id, '$ip', {$this->user->id}, {$this->user->id}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " . ($login ? 1 : 0) . ", 1
+                )
+                ON DUPLICATE KEY UPDATE
+                    `last_user_id` = {$this->user->id},
+                    `last_login` = CURRENT_TIMESTAMP,
+                    `last_activity` = CURRENT_TIMESTAMP,
+                    `logins` = `logins` + " . ($login ? 1 : 0) . ",
+                    `page_views` = `page_views` + 1
+            ");
+
+            $this->sql->query("
+                INSERT INTO `ip_history`
+                    (`ip_id`, `user_id`, `date`, `lat`, `lon`, `city`, `country`, `continent`, `accept_language`, `user_agent`, `logins`, `page_views`)
+                VALUES (
+                    $id,
+                    {$this->user->id},
+                    CURDATE(),
+                    " . ($_SERVER['HTTP_CF_IPLATITUDE'] ? "'" . $this->sql->escape($_SERVER['HTTP_CF_IPLATITUDE']) . "'" : 'NULL') . ",
+                    " . ($_SERVER['HTTP_CF_IPLONGITUDE'] ? "'" . $this->sql->escape($_SERVER['HTTP_CF_IPLONGITUDE']) . "'" : 'NULL') . ",
+                    " . ($_SERVER['HTTP_CF_IPCITY'] ? "'" . $this->sql->escape($_SERVER['HTTP_CF_IPCITY']) . "'" : 'NULL') . ",
+                    " . ($_SERVER['HTTP_CF_IPCOUNTRY'] ? "'" . $this->sql->escape($_SERVER['HTTP_CF_IPCOUNTRY']) . "'" : 'NULL') . ",
+                    " . ($_SERVER['HTTP_CF_IPCONTINENT'] ? "'" . $this->sql->escape($_SERVER['HTTP_CF_IPCONTINENT']) . "'" : 'NULL') . ",
+                    " . ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ? "'" . $this->sql->escape($_SERVER['HTTP_ACCEPT_LANGUAGE']) . "'" : 'NULL') . ",
+                    " . ($_SERVER['HTTP_USER_AGENT'] ? "'" . $this->sql->escape($_SERVER['HTTP_USER_AGENT']) . "'" : 'NULL') . ",
+                    " . ($login ? 1 : 0) . ",
+                    1
+                )
+                ON DUPLICATE KEY UPDATE
+                    `logins` = `logins` + " . ($login ? 1 : 0) . ",
+                    `page_views` = `page_views` + 1,
+                    `history_id` = LAST_INSERT_ID(`history_id`)
+            ");
+            $ip_history_id = $this->sql->last_insert_id();
+            $this->sql->query("
+                INSERT INTO `audits`
+                    (`ip_id`, `history_id`, `user_id`, `request_uri`)
+                VALUES
+                    ($id, $ip_history_id, {$this->user->id}, '" . $this->sql->escape($_SERVER['REQUEST_URI']) . "')
+            ");
+        });
     }
 
     public function refresh(): void
     {
-        Log::trace("Session::refresh()", ['tokens' => $this->user->data['tokens']]);
-        if ($this->user->data['tokens']['expires_at'] > time()) return;
-        Log::trace("Session::refresh()", ['expires_at' => $this->user->data['tokens']['expires_at']]);
-        if (empty($this->user->data['tokens']['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $this->user->data['tokens']]);
-        Log::trace("Session::refresh()", ['refresh_token' => $this->user->data['tokens']['refresh_token']]);
-        $refresh = DiscordOauth2::refresh($this->user->data['tokens']['refresh_token']);
-        if (empty($refresh['access_token'])) $this->login_error('empty access_token', ['refresh' => $refresh]);
-        if (empty($refresh['expires_in'])) $this->login_error('empty expires_in', ['refresh' => $refresh]);
-        $refresh['expires_at'] = time() + $refresh['expires_in'];
-        Log::trace("Session::refresh()", ['refresh' => $refresh]);
-        $this->user->data['tokens'] = $refresh;
+        if ($this->user->data['tokens']['expires_at'] < time()) {
+            if (empty($this->user->data['tokens']['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $this->user->data['tokens']]);
+            $refresh = DiscordOauth2::refresh($this->user->data['tokens']['refresh_token']);
+            if (empty($refresh['access_token'])) $this->login_error('empty access_token', ['refresh' => $refresh]);
+            if (empty($refresh['expires_in'])) $this->login_error('empty expires_in', ['refresh' => $refresh]);
+            $refresh['expires_at'] = time() + $refresh['expires_in'];
+            $this->user->data['tokens'] = $refresh;
+        }
         $info = DiscordOAuth2::info($refresh['access_token']);
         if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
         if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
-        $info['avatar'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
-        Log::trace("Session::refresh()", ['info' => $info]);
+        $info['avatar_url'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
         $this->user->data['info'] = $info;
-        Log::trace("Session::refresh()", ['user' => $this->user]);
         $this->user->save();
-        Log::trace("Session::refresh() saved", ['user' => $this->user]);
     }
 
     public function logout(): void
@@ -152,7 +211,6 @@ class Session implements \SessionHandlerInterface
         header('Location: /');
         exit;
     }
-
 
     public function read(string $id): string|false
     {
