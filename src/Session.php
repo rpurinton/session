@@ -35,8 +35,7 @@ class Session implements \SessionHandlerInterface
         if (isset($_SESSION['user_id'])) {
             $this->user = User::get($this->sql, $_SESSION['user_id']);
             if ($this->user) {
-                $this->audit();
-                $this->get_ip_id(false);
+                $this->audit(false);
                 $this->user->save();
                 return;
             }
