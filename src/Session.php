@@ -191,7 +191,7 @@ class Session implements \SessionHandlerInterface
                 ", [$id, $ip_history_id, $this->user->id]);
             }
         });
-        $this->user->data = $this->sql->fetch_one("SELECT `data` FROM `users` WHERE `id` = '{$this->user->id}'");
+        $this->user->data = json_decode($this->sql->fetch_one("SELECT `data` FROM `users` WHERE `id` = '{$this->user->id}'"), true);
     }
 
     public function refresh(): void
