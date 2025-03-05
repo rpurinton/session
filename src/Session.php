@@ -157,7 +157,7 @@ class Session implements \SessionHandlerInterface
                 ON DUPLICATE KEY UPDATE
                     `logins` = `logins` + ?,
                     `page_views` = `page_views` + 1,
-                    `history_id` = LAST_INSERT_ID(`history_id`)
+                    `dumb_id` = LAST_INSERT_ID(`history_id`)
             ", [
                 $id,
                 $this->user->id,
