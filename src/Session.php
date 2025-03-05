@@ -184,7 +184,7 @@ class Session implements \SessionHandlerInterface
                 $this->sql->prepareAndExecute("UPDATE `users`
                     SET 
                         `data` = JSON_SET(`data`, '$.audits.last_activity', CURRENT_TIMESTAMP),
-                        `data` = JSON_SET(`data`, '$.audits.page_views', `data`->'$.audits.page_views' + 1),
+                        `data` = JSON_SET(`data`, '$.audits.page_views', JSON_EXTRACT(`data`, '$.audits.page_views') + 1),
                         `data` = JSON_SET(`data`, '$.audits.last_ip_id', ?),
                         `data` = JSON_SET(`data`, '$.audits.last_history_id', ?)
                     WHERE `id` = ?
