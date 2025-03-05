@@ -134,62 +134,62 @@ class Session implements \SessionHandlerInterface
             'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
             'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
         ]);
-        $this->sql->transaction(function () use ($id, $ip, $login) {
-            $this->sql->prepareAndExecute("
-                INSERT INTO `ip_addresses`
-                    (`id`, `ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `last_activity`, `logins`, `page_views`)
-                VALUES
-                    (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, 1)
-                ON DUPLICATE KEY UPDATE
-                    `last_user_id` = ?,
-                    `last_login` = CURRENT_TIMESTAMP,
-                    `last_activity` = CURRENT_TIMESTAMP,
-                    `logins` = `logins` + ?,
-                    `page_views` = `page_views` + 1
-            ", [$id, $ip, $this->user->id, $this->user->id, $login ? 1 : 0, $this->user->id, $login ? 1 : 0]);
 
-            $this->sql->prepareAndExecute("
-                INSERT INTO `ip_history`
-                    (`ip_id`, `user_id`, `date`, `lat`, `lon`, `city`, `country`, `continent`, `accept_language`, `user_agent`, `logins`, `page_views`)
-                VALUES (
-                    ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, 1
-                )
-                ON DUPLICATE KEY UPDATE
-                    `logins` = `logins` + ?,
-                    `page_views` = `page_views` + 1,
-                    `dumb_id` = LAST_INSERT_ID(`history_id`)
-            ", [
-                $id,
-                $this->user->id,
-                $_SERVER['HTTP_CF_IPLATITUDE'] ? $this->sql->escape($_SERVER['HTTP_CF_IPLATITUDE']) : null,
-                $_SERVER['HTTP_CF_IPLONGITUDE'] ? $this->sql->escape($_SERVER['HTTP_CF_IPLONGITUDE']) : null,
-                $_SERVER['HTTP_CF_IPCITY'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCITY']) : null,
-                $_SERVER['HTTP_CF_IPCOUNTRY'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCOUNTRY']) : null,
-                $_SERVER['HTTP_CF_IPCONTINENT'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCONTINENT']) : null,
-                $_SERVER['HTTP_ACCEPT_LANGUAGE'] ? $this->sql->escape($_SERVER['HTTP_ACCEPT_LANGUAGE']) : null,
-                $_SERVER['HTTP_USER_AGENT'] ? $this->sql->escape($_SERVER['HTTP_USER_AGENT']) : null,
-                $login ? 1 : 0,
-                $login ? 1 : 0
-            ]);
-            $ip_history_id = $this->sql->last_insert_id();
-            $this->sql->prepareAndExecute("
-                INSERT INTO `audits`
-                    (`ip_id`, `history_id`, `user_id`, `request_uri`)
-                VALUES
-                    (?, ?, ?, ?)
-            ", [$id, $ip_history_id, $this->user->id, $this->sql->escape($_SERVER['REQUEST_URI'])]);
+        $this->sql->prepareAndExecute("
+            INSERT INTO `ip_addresses`
+                (`id`, `ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `last_activity`, `logins`, `page_views`)
+            VALUES
+                (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, 1)
+            ON DUPLICATE KEY UPDATE
+                `last_user_id` = ?,
+                `last_login` = CURRENT_TIMESTAMP,
+                `last_activity` = CURRENT_TIMESTAMP,
+                `logins` = `logins` + ?,
+                `page_views` = `page_views` + 1
+        ", [$id, $ip, $this->user->id, $this->user->id, $login ? 1 : 0, $this->user->id, $login ? 1 : 0]);
 
-            if (!$login) {
-                $this->sql->prepareAndExecute("UPDATE `users`
-                    SET 
-                        `data` = JSON_SET(`data`, '$.audits.last_activity', CURRENT_TIMESTAMP),
-                        `data` = JSON_SET(`data`, '$.audits.page_views', JSON_EXTRACT(`data`, '$.audits.page_views') + 1),
-                        `data` = JSON_SET(`data`, '$.audits.last_ip_id', ?),
-                        `data` = JSON_SET(`data`, '$.audits.last_history_id', ?)
-                    WHERE `id` = ?
-                ", [$id, $ip_history_id, $this->user->id]);
-            }
-        });
+        $this->sql->prepareAndExecute("
+            INSERT INTO `ip_history`
+                (`ip_id`, `user_id`, `date`, `lat`, `lon`, `city`, `country`, `continent`, `accept_language`, `user_agent`, `logins`, `page_views`)
+            VALUES (
+                ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, 1
+            )
+            ON DUPLICATE KEY UPDATE
+                `logins` = `logins` + ?,
+                `page_views` = `page_views` + 1,
+                `history_id` = LAST_INSERT_ID(`history_id`)
+        ", [
+            $id,
+            $this->user->id,
+            $_SERVER['HTTP_CF_IPLATITUDE'] ? $this->sql->escape($_SERVER['HTTP_CF_IPLATITUDE']) : null,
+            $_SERVER['HTTP_CF_IPLONGITUDE'] ? $this->sql->escape($_SERVER['HTTP_CF_IPLONGITUDE']) : null,
+            $_SERVER['HTTP_CF_IPCITY'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCITY']) : null,
+            $_SERVER['HTTP_CF_IPCOUNTRY'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCOUNTRY']) : null,
+            $_SERVER['HTTP_CF_IPCONTINENT'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCONTINENT']) : null,
+            $_SERVER['HTTP_ACCEPT_LANGUAGE'] ? $this->sql->escape($_SERVER['HTTP_ACCEPT_LANGUAGE']) : null,
+            $_SERVER['HTTP_USER_AGENT'] ? $this->sql->escape($_SERVER['HTTP_USER_AGENT']) : null,
+            $login ? 1 : 0,
+            $login ? 1 : 0
+        ]);
+        $ip_history_id = $this->sql->last_insert_id();
+        $this->sql->prepareAndExecute("
+            INSERT INTO `audits`
+                (`ip_id`, `history_id`, `user_id`, `request_uri`)
+            VALUES
+                (?, ?, ?, ?)
+        ", [$id, $ip_history_id, $this->user->id, $this->sql->escape($_SERVER['REQUEST_URI'])]);
+
+        if (!$login) {
+            $this->sql->prepareAndExecute("UPDATE `users`
+                SET 
+                    `data` = JSON_SET(`data`, '$.audits.last_activity', CURRENT_TIMESTAMP),
+                    `data` = JSON_SET(`data`, '$.audits.page_views', JSON_EXTRACT(`data`, '$.audits.page_views') + 1),
+                    `data` = JSON_SET(`data`, '$.audits.last_ip_id', ?),
+                    `data` = JSON_SET(`data`, '$.audits.last_history_id', ?)
+                WHERE `id` = ?
+            ", [$id, $ip_history_id, $this->user->id]);
+        }
+
         $this->user->data = json_decode($this->sql->fetch_one("SELECT `data` FROM `users` WHERE `id` = '{$this->user->id}'"), true);
     }
 
