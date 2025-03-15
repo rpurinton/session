@@ -12,7 +12,7 @@
     "require": {
         "php": "^8.0",
         "rpurinton/mysql": "^1.0.35",
-        "rpurinton/log": "^1.0.33",
+        "rpurinton/log": "^1.0.36",
         "rpurinton/discordoauth2": "^1.0.8"
     },
     "autoload": {
@@ -20,6 +20,6 @@
             "RPurinton\\": "src/"
         }
     },
-    "version": "1.0.55",
+    "version": "1.0.56",
     "minimum-stability": "stable"
 }
