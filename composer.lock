@@ -90,16 +90,16 @@
         },
         {
             "name": "rpurinton/https",
-            "version": "1.0.19",
+            "version": "1.0.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/https.git",
-                "reference": "eb764d0ea9067090191cc2affb9597df946178a4"
+                "reference": "e4cbd8e04b1f4e3ee02212de13c9fa9dcdfc76da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/https/zipball/eb764d0ea9067090191cc2affb9597df946178a4",
-                "reference": "eb764d0ea9067090191cc2affb9597df946178a4",
+                "url": "https://api.github.com/repos/rpurinton/https/zipball/e4cbd8e04b1f4e3ee02212de13c9fa9dcdfc76da",
+                "reference": "e4cbd8e04b1f4e3ee02212de13c9fa9dcdfc76da",
                 "shasum": ""
             },
             "require": {
@@ -125,28 +125,28 @@
             "description": "Abstract Static Class for making HTTPS Requests in PHP/Composer",
             "support": {
                 "issues": "https://github.com/rpurinton/https/issues",
-                "source": "https://github.com/rpurinton/https/tree/1.0.19"
+                "source": "https://github.com/rpurinton/https/tree/1.0.26"
             },
-            "time": "2025-03-03T10:29:38+00:00"
+            "time": "2025-03-14T21:13:46+00:00"
         },
         {
             "name": "rpurinton/log",
-            "version": "1.0.33",
+            "version": "1.0.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/log.git",
-                "reference": "1725fe09dc344b0c11d3f716577e5ec639d07bb4"
+                "reference": "01750fe8ddddf74ea46c1a27996c2cf6f8dfed42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/log/zipball/1725fe09dc344b0c11d3f716577e5ec639d07bb4",
-                "reference": "1725fe09dc344b0c11d3f716577e5ec639d07bb4",
+                "url": "https://api.github.com/repos/rpurinton/log/zipball/01750fe8ddddf74ea46c1a27996c2cf6f8dfed42",
+                "reference": "01750fe8ddddf74ea46c1a27996c2cf6f8dfed42",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.0",
                 "rpurinton/config": "^1.0.25",
-                "rpurinton/webhook": "^1.0.9"
+                "rpurinton/webhook": "^1.0.10"
             },
             "type": "library",
             "autoload": {
@@ -167,9 +167,9 @@
             "description": "A Logging Library",
             "support": {
                 "issues": "https://github.com/rpurinton/log/issues",
-                "source": "https://github.com/rpurinton/log/tree/1.0.33"
+                "source": "https://github.com/rpurinton/log/tree/1.0.36"
             },
-            "time": "2025-03-05T21:27:51+00:00"
+            "time": "2025-03-14T21:18:34+00:00"
         },
         {
             "name": "rpurinton/mysql",
@@ -216,21 +216,21 @@
         },
         {
             "name": "rpurinton/webhook",
-            "version": "1.0.9",
+            "version": "1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/webhook.git",
-                "reference": "20d2f558f1b15e8b5f395682076658a803baaca1"
+                "reference": "d4132f4d2c3d12840f50f7f30cc2e7561e316755"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/webhook/zipball/20d2f558f1b15e8b5f395682076658a803baaca1",
-                "reference": "20d2f558f1b15e8b5f395682076658a803baaca1",
+                "url": "https://api.github.com/repos/rpurinton/webhook/zipball/d4132f4d2c3d12840f50f7f30cc2e7561e316755",
+                "reference": "d4132f4d2c3d12840f50f7f30cc2e7561e316755",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.0",
-                "rpurinton/https": "^1.0.19"
+                "rpurinton/https": "^1.0.26"
             },
             "type": "library",
             "autoload": {
@@ -251,20 +251,20 @@
             "description": "A PHP Library for posting to webhooks.",
             "support": {
                 "issues": "https://github.com/rpurinton/webhook/issues",
-                "source": "https://github.com/rpurinton/webhook/tree/1.0.9"
+                "source": "https://github.com/rpurinton/webhook/tree/1.0.10"
             },
-            "time": "2025-03-03T10:31:28+00:00"
+            "time": "2025-03-14T21:15:56+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.0"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
