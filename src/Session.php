@@ -11,6 +11,7 @@ class Session implements \SessionHandlerInterface
 {
     public array $config = [];
     public ?User $user = null;
+    public array $grants = [];
 
     public function __construct(bool $allow_insecure = false, bool $json_error = true, public ?MySQL $sql = null)
     {
@@ -88,8 +89,8 @@ class Session implements \SessionHandlerInterface
         if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
         $id = (int)$info['id'];
         $info['avatar_url'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
-        $grants = $this->sql->fetch_one("SELECT `id` FROM `grants` WHERE `id` = '$id'");
-        if (empty($grants)) $this->login_error('empty grants', ['grants' => $grants]);
+        $this->grants = $this->sql->fetch_all("SELECT * FROM `grants` WHERE `grantee_id` = '$id'");
+        if (empty($grants)) $this->login_error('empty grants', ['grants' => $this->grants]);
         $ip_id = ip2long($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']);
         if ($ip_id === false) $this->login_error('invalid ip', [
             'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
