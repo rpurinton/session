@@ -90,7 +90,7 @@ class Session implements \SessionHandlerInterface
         $id = (int)$info['id'];
         $info['avatar_url'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
         $this->grants = $this->sql->fetch_all("SELECT * FROM `grants` WHERE `grantee_id` = '$id'");
-        if (empty($grants)) $this->login_error('empty grants', ['grants' => $this->grants]);
+        if (empty($this->grants)) $this->login_error('empty grants', ['grants' => $this->grants]);
         $ip_id = ip2long($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']);
         if ($ip_id === false) $this->login_error('invalid ip', [
             'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
