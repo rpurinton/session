@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bbccacd37bcb35cc5cd42510fb4e5e03",
+    "content-hash": "f58f6d1171ef1bb2d4e063049568e198",
     "packages": [
         {
             "name": "rpurinton/config",
@@ -131,16 +131,16 @@
         },
         {
             "name": "rpurinton/log",
-            "version": "1.0.36",
+            "version": "1.0.39",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/log.git",
-                "reference": "01750fe8ddddf74ea46c1a27996c2cf6f8dfed42"
+                "reference": "2f9289db253415f44224c0f7fb132c988e80d89c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/log/zipball/01750fe8ddddf74ea46c1a27996c2cf6f8dfed42",
-                "reference": "01750fe8ddddf74ea46c1a27996c2cf6f8dfed42",
+                "url": "https://api.github.com/repos/rpurinton/log/zipball/2f9289db253415f44224c0f7fb132c988e80d89c",
+                "reference": "2f9289db253415f44224c0f7fb132c988e80d89c",
                 "shasum": ""
             },
             "require": {
@@ -167,9 +167,9 @@
             "description": "A Logging Library",
             "support": {
                 "issues": "https://github.com/rpurinton/log/issues",
-                "source": "https://github.com/rpurinton/log/tree/1.0.36"
+                "source": "https://github.com/rpurinton/log/tree/1.0.39"
             },
-            "time": "2025-03-14T21:18:34+00:00"
+            "time": "2025-03-16T00:39:22+00:00"
         },
         {
             "name": "rpurinton/mysql",
