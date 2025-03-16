@@ -230,13 +230,84 @@ class Session implements \SessionHandlerInterface
     public function write(string $id, string $data): bool
     {
         $access = time();
-        $this->sql->transaction(function () use ($id, $access, $data) {
-            $lockQuery = "SELECT data FROM sessions_php WHERE id = ? FOR UPDATE";
-            $this->sql->prepareAndExecute($lockQuery, [$id]);
-            $query = "REPLACE INTO sessions_php (id, access, data) VALUES (?, ?, ?)";
-            $this->sql->prepareAndExecute($query, [$id, $access, $data]);
-        });
-        return true;
+        $maxRetries = 3;
+        $attempt = 0;
+        while ($attempt < $maxRetries) {
+            try {
+                $this->sql->transaction(function () use ($id, $access, $data) {
+                    // Lock the row and get existing session data.
+                    $lockQuery = "SELECT data FROM sessions_php WHERE id = ? FOR UPDATE";
+                    $result = $this->sql->prepareAndExecute($lockQuery, [$id]);
+                    $existingData = "";
+                    if ($row = $result->fetch_assoc()) {
+                        $existingData = $row['data'];
+                    }
+                    // Merge existing data with new data.
+                    $mergedData = $this->mergeSessionData($existingData, $data);
+
+                    $query = "REPLACE INTO sessions_php (id, access, data) VALUES (?, ?, ?)";
+                    $this->sql->prepareAndExecute($query, [$id, $access, $mergedData]);
+                });
+                return true;
+            } catch (\RPurinton\Exceptions\MySQLException $e) {
+                if (strpos($e->getMessage(), 'Deadlock') !== false) {
+                    $attempt++;
+                    usleep(100000); // wait 100ms before retrying
+                    if ($attempt === $maxRetries) {
+                        throw $e; // rethrow error after max retries
+                    }
+                } else {
+                    throw $e; // other exceptions are not retriable
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Convert serialized PHP session data into an associative array.
+     */
+    private function unserializeSessionData(string $session_data): array
+    {
+        $return = [];
+        $offset = 0;
+        while ($offset < strlen($session_data)) {
+            if (false === ($pos = strpos($session_data, "|", $offset))) {
+                break;
+            }
+            $varname = substr($session_data, $offset, $pos - $offset);
+            $offset = $pos + 1;
+            $data = unserialize(substr($session_data, $offset));
+            $return[$varname] = $data;
+            // Calculate the length of the serialized data for this variable.
+            $serialized = serialize($data);
+            $offset += strlen($serialized);
+        }
+        return $return;
+    }
+
+    /**
+     * Convert an associative array back into PHP session format.
+     */
+    private function serializeSessionData(array $data): string
+    {
+        $session_data = '';
+        foreach ($data as $key => $value) {
+            $session_data .= $key . '|' . serialize($value);
+        }
+        return $session_data;
+    }
+
+    /**
+     * Merge two session data strings.
+     */
+    private function mergeSessionData(string $existing, string $new): string
+    {
+        $oldData = $this->unserializeSessionData($existing);
+        $newData = $this->unserializeSessionData($new);
+        // New data overrides existing keys.
+        $merged = array_merge($oldData, $newData);
+        return $this->serializeSessionData($merged);
     }
 
     public function destroy(string $id): bool
