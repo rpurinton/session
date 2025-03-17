@@ -135,7 +135,7 @@ class Session implements \SessionHandlerInterface
         // Update ip_addresses table using the IP string.
         $this->sql->prepareAndExecute("
         INSERT INTO `ip_addresses`
-            (``ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `first_activity`, `last_activity`, `logins`, `page_views`)
+            (`ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `first_activity`, `last_activity`, `logins`, `page_views`)
         VALUES
             (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, 1)
         ON DUPLICATE KEY UPDATE
