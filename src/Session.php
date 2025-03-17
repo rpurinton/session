@@ -275,18 +275,20 @@ class Session implements \SessionHandlerInterface
     private function unserializeSessionData(string $session_data): array
     {
         $return = [];
-        $offset = 0;
-        while ($offset < strlen($session_data)) {
-            if (false === ($pos = strpos($session_data, "|", $offset))) {
+        while ($session_data !== '') {
+            $pos = strpos($session_data, "|");
+            if ($pos === false) {
                 break;
             }
-            $varname = substr($session_data, $offset, $pos - $offset);
-            $offset = $pos + 1;
-            $data = unserialize(substr($session_data, $offset));
-            $return[$varname] = $data;
-            // Calculate the length of the serialized data for this variable.
-            $serialized = serialize($data);
-            $offset += strlen($serialized);
+            $key = substr($session_data, 0, $pos);
+            $session_data = substr($session_data, $pos + 1);
+            $value = @unserialize($session_data);
+            if ($value === false && $session_data !== 'b:0;') {
+                break;
+            }
+            $serialized = serialize($value);
+            $return[$key] = $value;
+            $session_data = substr($session_data, strlen($serialized));
         }
         return $return;
     }
