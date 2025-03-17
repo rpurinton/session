@@ -151,7 +151,7 @@ class Session implements \SessionHandlerInterface
             (`ip`, `user_id`, `date`, `lat`, `lon`, `city`, `country`, `continent`, `accept_language`, `user_agent`, 
              `region`, `region_code`, `postal_code`, `metro_code`, `timezone`, `logins`, `page_views`)
         VALUES (
-            ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1
+            ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1
         )
         ON DUPLICATE KEY UPDATE
             `logins` = `logins` + ?,
