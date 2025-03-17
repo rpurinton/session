@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3fc92539a1389390e5d8f5c773cc8eda",
+    "content-hash": "b7289f8fef1348a1a6f01fdbb7433bfd",
     "packages": [
         {
             "name": "rpurinton/config",
