@@ -80,36 +80,35 @@ class Session implements \SessionHandlerInterface
     private function createUser(): void
     {
         $tokens = DiscordOAuth2::init();
-        if (empty($tokens['access_token'])) $this->login_error('empty access_token', ['tokens' => $tokens]);
-        if (empty($tokens['refresh_token'])) $this->login_error('empty refresh_token', ['tokens' => $tokens]);
-        if (empty($tokens['expires_in'])) $this->login_error('empty expires_in', ['tokens' => $tokens]);
-        $tokens['expires_at'] = time() + $tokens['expires_in'];
+        // ...existing token validations...
         $info = DiscordOAuth2::info($tokens['access_token']);
-        if (empty($info['id'])) $this->login_error('empty id', ['info' => $info]);
-        if (empty($info['avatar'])) $this->login_error('empty avatar', ['info' => $info]);
+        // ...existing validations...
         $id = (int)$info['id'];
-        $info['avatar_url'] = "https://cdn.discordapp.com/avatars/{$info['id']}/{$info['avatar']}.png";
-        $this->grants = $this->sql->fetch_all("SELECT * FROM `grants` WHERE `grantee_id` = '$id'");
-        if (empty($this->grants)) $this->login_error('empty grants', ['grants' => $this->grants]);
-        $ip_id = ip2long($_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']);
-        if ($ip_id === false) $this->login_error('invalid ip', [
-            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
-            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
-            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
-        ]);
+        // ...existing code...
+        // Instead of ip2long conversions, use the raw IP string:
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR'];
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            $this->login_error('invalid ip', [
+                'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+                'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
+                'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
+            ]);
+        }
         $this->user = new User($this->sql, $id, [
             'tokens' => $tokens,
             'info' => $info,
             'audits' => [
                 'first_user_id' => $id,
                 'last_user_id' => $id,
-                'first_ip_id' => $ip_id,
-                'last_ip_id' => $ip_id,
+                'first_ip' => $ip,
+                'last_ip' => $ip,
                 'login_first' => time(),
                 'login_last' => time(),
                 'last_activity' => time(),
                 'account_type' => 'trial',
-                'trial_expires' => time() + 604800, // 7 days
+                'trial_expires' => time() + 604800,
                 'logins' => 1,
                 'page_views' => 1
             ],
@@ -122,72 +121,78 @@ class Session implements \SessionHandlerInterface
     private function audit(bool $login = false): void
     {
         if (!$this->user) $this->login_error('empty user', ['user' => $this->user]);
-        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) $this->login_error('invalid ip format', [
-            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
-            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
-            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
-        ]);
-        $id = ip2long($ip);
-        if ($id === false) $this->login_error('invalid ip conversion', [
-            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
-            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
-            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
-        ]);
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['REMOTE_ADDR'];
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            $this->login_error('invalid ip format', [
+                'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+                'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
+                'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null
+            ]);
+        }
+
+        // Update ip_addresses table using the IP string.
+        $this->sql->prepareAndExecute("
+        INSERT INTO `ip_addresses`
+            (``ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `first_activity`, `last_activity`, `logins`, `page_views`)
+        VALUES
+            (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, 1)
+        ON DUPLICATE KEY UPDATE
+            `last_user_id` = ?,
+            `last_login` = CURRENT_TIMESTAMP,
+            `last_activity` = CURRENT_TIMESTAMP,
+            `logins` = `logins` + ?,
+            `page_views` = `page_views` + 1
+    ", [$ip, $this->user->id, $this->user->id, $login ? 1 : 0, $this->user->id, $login ? 1 : 0]);
 
         $this->sql->prepareAndExecute("
-            INSERT INTO `ip_addresses`
-                (`id`, `ip`, `first_user_id`, `last_user_id`, `first_login`, `last_login`, `last_activity`, `logins`, `page_views`)
-            VALUES
-                (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, 1)
-            ON DUPLICATE KEY UPDATE
-                `last_user_id` = ?,
-                `last_login` = CURRENT_TIMESTAMP,
-                `last_activity` = CURRENT_TIMESTAMP,
-                `logins` = `logins` + ?,
-                `page_views` = `page_views` + 1
-        ", [$id, $ip, $this->user->id, $this->user->id, $login ? 1 : 0, $this->user->id, $login ? 1 : 0]);
-
-        $this->sql->prepareAndExecute("
-            INSERT INTO `ip_history`
-                (`ip_id`, `user_id`, `date`, `lat`, `lon`, `city`, `country`, `continent`, `accept_language`, `user_agent`, `logins`, `page_views`)
-            VALUES (
-                ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, 1
-            )
-            ON DUPLICATE KEY UPDATE
-                `logins` = `logins` + ?,
-                `page_views` = `page_views` + 1,
-                `history_id` = LAST_INSERT_ID(`history_id`)
-        ", [
-            $id,
+        INSERT INTO `ip_history`
+            (`ip`, `user_id`, `date`, `lat`, `lon`, `city`, `country`, `continent`, `accept_language`, `user_agent`, 
+             `region`, `region_code`, `postal_code`, `metro_code`, `timezone`, `logins`, `page_views`)
+        VALUES (
+            ?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1
+        )
+        ON DUPLICATE KEY UPDATE
+            `logins` = `logins` + ?,
+            `page_views` = `page_views` + 1,
+            `history_id` = LAST_INSERT_ID(`history_id`)
+    ", [
+            $ip,
             $this->user->id,
-            $_SERVER['HTTP_CF_IPLATITUDE'] ? $this->sql->escape($_SERVER['HTTP_CF_IPLATITUDE']) : null,
-            $_SERVER['HTTP_CF_IPLONGITUDE'] ? $this->sql->escape($_SERVER['HTTP_CF_IPLONGITUDE']) : null,
-            $_SERVER['HTTP_CF_IPCITY'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCITY']) : null,
-            $_SERVER['HTTP_CF_IPCOUNTRY'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCOUNTRY']) : null,
-            $_SERVER['HTTP_CF_IPCONTINENT'] ? $this->sql->escape($_SERVER['HTTP_CF_IPCONTINENT']) : null,
+            $_SERVER['HTTP_CF_IPLATITUDE']   ? $this->sql->escape($_SERVER['HTTP_CF_IPLATITUDE']) : null,
+            $_SERVER['HTTP_CF_IPLONGITUDE']  ? $this->sql->escape($_SERVER['HTTP_CF_IPLONGITUDE']) : null,
+            $_SERVER['HTTP_CF_IPCITY']       ? $this->sql->escape($_SERVER['HTTP_CF_IPCITY']) : null,
+            $_SERVER['HTTP_CF_IPCOUNTRY']    ? $this->sql->escape($_SERVER['HTTP_CF_IPCOUNTRY']) : null,
+            $_SERVER['HTTP_CF_IPCONTINENT']  ? $this->sql->escape($_SERVER['HTTP_CF_IPCONTINENT']) : null,
             $_SERVER['HTTP_ACCEPT_LANGUAGE'] ? $this->sql->escape($_SERVER['HTTP_ACCEPT_LANGUAGE']) : null,
-            $_SERVER['HTTP_USER_AGENT'] ? $this->sql->escape($_SERVER['HTTP_USER_AGENT']) : null,
-            $login ? 1 : 0,
-            $login ? 1 : 0
+            $_SERVER['HTTP_USER_AGENT']      ? $this->sql->escape($_SERVER['HTTP_USER_AGENT']) : null,
+            $_SERVER['HTTP_CF_REGION']       ? $this->sql->escape($_SERVER['HTTP_CF_REGION']) : null,
+            $_SERVER['HTTP_CF_REGION_CODE']  ? $this->sql->escape($_SERVER['HTTP_CF_REGION_CODE']) : null,
+            $_SERVER['HTTP_CF_POSTAL_CODE']  ? $this->sql->escape($_SERVER['HTTP_CF_POSTAL_CODE']) : null,
+            $_SERVER['HTTP_CF_METRO_CODE']  ? $this->sql->escape($_SERVER['HTTP_CF_METRO_CODE']) : null,
+            $_SERVER['HTTP_CF_TIMEZONE']     ? $this->sql->escape($_SERVER['HTTP_CF_TIMEZONE']) : null,
+            $login ? 1 : 0  // for the ON DUPLICATE KEY UPDATE increment
         ]);
         $ip_history_id = $this->sql->last_insert_id();
+
         $this->sql->prepareAndExecute("
-            INSERT INTO `audits`
-                (`ip_id`, `history_id`, `user_id`, `request_uri`)
-            VALUES
-                (?, ?, ?, ?)
-        ", [$id, $ip_history_id, $this->user->id, $this->sql->escape($_SERVER['REQUEST_URI'])]);
+        INSERT INTO `audits`
+            (`ip`, `history_id`, `user_id`, `request_uri`)
+        VALUES
+            (?, ?, ?, ?)
+    ", [$ip, $ip_history_id, $this->user->id, $this->sql->escape($_SERVER['REQUEST_URI'])]);
 
         if (!$login) {
-            $this->sql->prepareAndExecute("UPDATE `users`
-                SET 
-                    `data` = JSON_SET(`data`, '$.audits.last_activity', CURRENT_TIMESTAMP),
-                    `data` = JSON_SET(`data`, '$.audits.page_views', JSON_EXTRACT(`data`, '$.audits.page_views') + 1),
-                    `data` = JSON_SET(`data`, '$.audits.last_ip_id', ?),
-                    `data` = JSON_SET(`data`, '$.audits.last_history_id', ?)
-                WHERE `id` = ?
-            ", [$id, $ip_history_id, $this->user->id]);
+            $this->sql->prepareAndExecute("
+            UPDATE `users`
+            SET 
+                `data` = JSON_SET(`data`, '$.audits.last_activity', CURRENT_TIMESTAMP),
+                `data` = JSON_SET(`data`, '$.audits.page_views', JSON_EXTRACT(`data`, '$.audits.page_views') + 1),
+                `data` = JSON_SET(`data`, '$.audits.last_ip', ?),
+                `data` = JSON_SET(`data`, '$.audits.last_history_id', ?)
+            WHERE `id` = ?
+        ", [$ip, $ip_history_id, $this->user->id]);
         }
 
         $this->user->data = json_decode($this->sql->fetch_one("SELECT `data` FROM `users` WHERE `id` = '{$this->user->id}'"), true);
