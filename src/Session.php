@@ -274,23 +274,15 @@ class Session implements \SessionHandlerInterface
      */
     private function unserializeSessionData(string $session_data): array
     {
-        $return = [];
-        while ($session_data !== '') {
-            $pos = strpos($session_data, "|");
-            if ($pos === false) {
-                break;
-            }
-            $key = substr($session_data, 0, $pos);
-            $session_data = substr($session_data, $pos + 1);
-            $value = @unserialize($session_data);
-            if ($value === false && $session_data !== 'b:0;') {
-                break;
-            }
-            $serialized = serialize($value);
-            $return[$key] = $value;
-            $session_data = substr($session_data, strlen($serialized));
-        }
-        return $return;
+        // Backup current session data
+        $backup = $_SESSION;
+        // Clear session array so session_decode() sets only from string.
+        $_SESSION = [];
+        session_decode($session_data);
+        $data = $_SESSION;
+        // Restore the original session data
+        $_SESSION = $backup;
+        return $data;
     }
 
     /**
