@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d6935cdae5c9636cea06d903752c23d",
+    "content-hash": "136e0da1ec79b68e3c3ab04a8d01d1e7",
     "packages": [
         {
             "name": "rpurinton/config",
@@ -49,21 +49,21 @@
         },
         {
             "name": "rpurinton/discordoauth2",
-            "version": "1.0.8",
+            "version": "1.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/discordoauth2.git",
-                "reference": "28aa15c04544b20a1638a8051ccea6cb7881ce9f"
+                "reference": "f7bdcc0c5dcdc376cd81780b4d1597c4b2957ff2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/discordoauth2/zipball/28aa15c04544b20a1638a8051ccea6cb7881ce9f",
-                "reference": "28aa15c04544b20a1638a8051ccea6cb7881ce9f",
+                "url": "https://api.github.com/repos/rpurinton/discordoauth2/zipball/f7bdcc0c5dcdc376cd81780b4d1597c4b2957ff2",
+                "reference": "f7bdcc0c5dcdc376cd81780b4d1597c4b2957ff2",
                 "shasum": ""
             },
             "require": {
                 "rpurinton/config": "^1.0.25",
-                "rpurinton/https": "^1.0.19"
+                "rpurinton/https": "^1.0.26"
             },
             "type": "library",
             "autoload": {
@@ -84,9 +84,9 @@
             "description": "A Discord OAuth2 Library for PHP",
             "support": {
                 "issues": "https://github.com/rpurinton/discordoauth2/issues",
-                "source": "https://github.com/rpurinton/discordoauth2/tree/1.0.8"
+                "source": "https://github.com/rpurinton/discordoauth2/tree/1.0.9"
             },
-            "time": "2025-03-04T19:07:25+00:00"
+            "time": "2025-03-21T15:34:30+00:00"
         },
         {
             "name": "rpurinton/https",
@@ -173,23 +173,23 @@
         },
         {
             "name": "rpurinton/mysql",
-            "version": "1.0.35",
+            "version": "1.0.37",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rpurinton/mysql.git",
-                "reference": "2541932f98cb49da3b0c3009196ccd65c8004b95"
+                "reference": "ee5d170111f3244568d86f102ac63fc030fd9e8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/2541932f98cb49da3b0c3009196ccd65c8004b95",
-                "reference": "2541932f98cb49da3b0c3009196ccd65c8004b95",
+                "url": "https://api.github.com/repos/rpurinton/mysql/zipball/ee5d170111f3244568d86f102ac63fc030fd9e8a",
+                "reference": "ee5d170111f3244568d86f102ac63fc030fd9e8a",
                 "shasum": ""
             },
             "require": {
                 "ext-mysqli": "*",
                 "php": "^8.0",
                 "rpurinton/config": "^1.0.25",
-                "rpurinton/log": "^1.0.33"
+                "rpurinton/log": "^1.0.39"
             },
             "type": "library",
             "autoload": {
@@ -210,9 +210,9 @@
             "description": "A MySQL Library",
             "support": {
                 "issues": "https://github.com/rpurinton/mysql/issues",
-                "source": "https://github.com/rpurinton/mysql/tree/1.0.35"
+                "source": "https://github.com/rpurinton/mysql/tree/1.0.37"
             },
-            "time": "2025-03-05T21:34:25+00:00"
+            "time": "2025-03-21T02:24:32+00:00"
         },
         {
             "name": "rpurinton/webhook",
